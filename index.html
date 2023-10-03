@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link rel="stylesheet" href="css/style.min.css" />
+    <script defer src="js/app.js"></script>
+  </head>
+  <body>
+    <header class="header">
+      <div class="container">
+        <div class="header__wrapper">
+          <img src="images/monster.png" alt="it monster" class="header__img" />
+          <select class="header__select-theme">
+            <!-- <option value="default" selected hidden disabled>
+              Choose theme
+            </option> -->
+            <option value="dark">Dark theme</option>
+            <option value="light">Light theme</option>
+          </select>
+        </div>
+      </div>
+    </header>
+    <main class="main">
+      <div class="container">
+        <h1>Todo List</h1>
+        <form class="add-task" action="#">
+          <h2>Add new task</h2>
+          <div class="input-group">
+            <input
+              data-message="Title can't be blank"
+              data-min-length="3"
+              type="text"
+              name="taskTitle"
+              placeholder="Title"
+            />
+            <span class="input-error"></span>
+          </div>
+          <div class="input-group">
+            <textarea
+              data-message="Text can't be blank"
+              data-min-length="10"
+              name="taskText"
+              placeholder="Text"
+            ></textarea>
+            <span class="input-error"></span>
+          </div>
+          <button class="btn">Add task</button>
+        </form>
+        <div class="tasks-wrapper"></div>
+      </div>
+    </main>
+    <div class="overlay">
+      <div class="modal">
+        <p class="modal__text">Are you sure you want to delete task:</p>
+        <div class="modal__btns">
+          <button class="btn btn--delete">Delete</button>
+          <button class="btn btn--cancel">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
