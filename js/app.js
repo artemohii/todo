@@ -50,12 +50,16 @@ const inputText = form.elements.taskText;
 const overlay = document.querySelector(".overlay");
 const modal = document.querySelector(".modal");
 const themeSelect = document.querySelector(".header__select-theme");
+const htmlRoot = document.querySelector(":root");
 
 // Variables
 const inputs = [inputTitle, inputText];
+const themeFromLS = localStorage.getItem("theme");
 
 // Events
 renderAllTasks();
+setTheme(themeFromLS); 
+// баг , при выборе светлой темы и рефреш, темная тема выбирается только после выбора светлой темы 
 
 /* Event on form */
 form.addEventListener("submit", onSubmitForm);
@@ -177,11 +181,20 @@ function hideModal() {
 
 function onChangeTheme(e) {
   const selectedTheme = e.target.value;
+  localStorage.setItem("theme", selectedTheme);
+  setTheme(selectedTheme)
+}
+
+function setTheme(themeName) {
+  const themeObj = themes[themeName];
+  for (let key in themeObj) {
+    htmlRoot.style.setProperty(key, themeObj[key]);
+  }
 }
 
 /* localStorage */
 
-console.log(localStorage);
+/* console.log(localStorage); */
 localStorage.setItem("test", "value-test"); // Збереження даних у localStorage
 localStorage.getItem("test"); // -> "value-test "Отримання даних з localStorage
 //localStorage.removeItem("test");// Видалення даних з localStorage
