@@ -30,6 +30,10 @@ const tasksObj = tasks.reduce((acc, el) => {
   return acc;
 }, {});
 
+if (!localStorage.getItem("tasks")) {
+  updateTasksInLS(tasksObj);
+}
+
 const themes = {
   dark: {
     "--primary": "#181818",
@@ -51,15 +55,16 @@ const overlay = document.querySelector(".overlay");
 const modal = document.querySelector(".modal");
 const themeSelect = document.querySelector(".header__select-theme");
 const htmlRoot = document.querySelector(":root");
+const btnToggle = document.querySelector(".btn--toggle");
 
 // Variables
 const inputs = [inputTitle, inputText];
 const themeFromLS = localStorage.getItem("theme");
+const tasksFromLS = JSON.parse(localStorage.getItem("tasks"));
 
 // Events
 renderAllTasks();
-setTheme(themeFromLS); 
-// баг , при выборе светлой темы и рефреш, темная тема выбирается только после выбора светлой темы 
+setTheme(themeFromLS);
 
 /* Event on form */
 form.addEventListener("submit", onSubmitForm);
@@ -69,6 +74,17 @@ tasksWrapper.addEventListener("click", onDeleteTask);
 
 /* Event on Select */
 themeSelect.addEventListener("change", onChangeTheme);
+
+// 1
+/* if (themeFromLS) {
+  themeSelect.value = themeFromLS;
+} else {
+  themeSelect.value = "dark";
+} */
+// 2
+/* themeSelect.value = themeFromLS ? themeFromLS : "dark"; */
+// 3
+themeSelect.value = themeFromLS || "dark";
 
 // Functions
 function createTaskTemplate({ title, text, id }) {
@@ -80,14 +96,14 @@ function createTaskTemplate({ title, text, id }) {
         <button class="btn btn--delete">Delete Task</button>
       </div>
     </div>
+    <span></span>
   `;
 }
 
 function renderAllTasks() {
-  const fragment = Object.values(tasksObj).reduce(
-    (acc, task) => (acc += createTaskTemplate(task)),
-    ""
-  );
+  const fragment = Object.values(tasksFromLS)
+    .reverse()
+    .reduce((acc, task) => (acc += createTaskTemplate(task)), "");
   tasksWrapper.insertAdjacentHTML("beforeend", fragment);
 }
 
@@ -109,6 +125,7 @@ function onSubmitForm(e) {
   }
   if (!error) {
     const newTask = createNewTask(titleValue, textValue);
+    updateTasksInLS(tasksFromLS);
     tasksWrapper.insertAdjacentHTML("afterbegin", createTaskTemplate(newTask));
   }
   e.target.reset();
@@ -137,9 +154,8 @@ function createNewTask(title, text) {
     title, // === title: title,
     completed: false,
   };
-  tasksObj[task.id] = task;
+  tasksFromLS[task.id] = task;
   return task;
-  // console.log(tasksObj);
 }
 
 /* Delete tasks */
@@ -148,16 +164,20 @@ function onDeleteTask(e) {
     const task = e.target.closest(".task");
     const taskId = task.id;
     showModal();
-    modal.addEventListener("click", (e) => {
+    function modalClickHandler(e) {
       if (e.target.classList.contains("btn--delete")) {
         deleteTaskFromLayout(task);
         deleteTaskFromObj(taskId);
+        updateTasksInLS(tasksFromLS);
         hideModal();
+        modal.removeEventListener("click", modalClickHandler);
       }
       if (e.target.classList.contains("btn--cancel")) {
         hideModal();
+        modal.removeEventListener("click", modalClickHandler);
       }
-    });
+    }
+    modal.addEventListener("click", modalClickHandler);
   }
 }
 
@@ -166,7 +186,7 @@ function deleteTaskFromLayout(task) {
 }
 
 function deleteTaskFromObj(taskId) {
-  delete tasksObj[taskId];
+  delete tasksFromLS[taskId];
 }
 
 function showModal() {
@@ -182,7 +202,7 @@ function hideModal() {
 function onChangeTheme(e) {
   const selectedTheme = e.target.value;
   localStorage.setItem("theme", selectedTheme);
-  setTheme(selectedTheme)
+  setTheme(selectedTheme);
 }
 
 function setTheme(themeName) {
@@ -198,3 +218,30 @@ function setTheme(themeName) {
 localStorage.setItem("test", "value-test"); // Збереження даних у localStorage
 localStorage.getItem("test"); // -> "value-test "Отримання даних з localStorage
 //localStorage.removeItem("test");// Видалення даних з localStorage
+// localStorage.setItem("tasks", { name: "Go to shop" });
+console.log(String({ name: "Go to shop" }));
+
+const obj = {
+  name: "Go to shop",
+  info: {
+    num: 1000,
+  },
+};
+
+// const newObj = { ...obj };
+// const newObj = structuredClone(obj);
+const objJSON = JSON.stringify(obj);
+const newObj = JSON.parse(objJSON);
+
+/* newObj.name = "qwerty";
+newObj.info.num = 2000; */
+
+// console.log(obj);
+// console.log(newObj);
+
+function updateTasksInLS(obj) {
+  localStorage.setItem("tasks", JSON.stringify(obj));
+}
+
+// const newTasks = JSON.parse(tasksJSON);
+// console.log(newTasks);
